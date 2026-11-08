@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECC-SecureGuard | Hệ Thống Thông Tin An Toàn ECC</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="brand">
+                <span class="brand-icon">🛡️</span>
+                <div>
+                    <h1 class="brand-title">ECC-SecureGuard</h1>
+                    <div class="brand-subtitle">Elliptic Curve Cryptography Information System</div>
+                </div>
+            </div>
+            <div class="sys-badge" id="systemStatusBadge">
+                <span class="dot"></span>
+                <span id="systemStatusText">Đang kết nối hệ thống...</span>
+            </div>
+        </div>
+
+        <nav class="tabs-nav">
+            <button class="tab-btn active" data-tab="overview">🏛️ Tổng Quan Kiến Trúc</button>
+            <button class="tab-btn" data-tab="keystudio">🔑 Quản Lý Khóa (KMS)</button>
+            <button class="tab-btn" data-tab="handshake">🤝 Bắt Tay ECDHE (PFS)</button>
+            <button class="tab-btn" data-tab="signatures">✍️ Chữ Ký Số (Ed25519)</button>
+            <button class="tab-btn" data-tab="vault">📦 Kho Tài Liệu Mật (ECIES)</button>
+            <button class="tab-btn" data-tab="attackslab">🔬 Phòng Thí Nghiệm Tấn Công</button>
+            <button class="tab-btn" data-tab="benchmark">⚡ Benchmark Hiệu Năng</button>
+            <button class="tab-btn" data-tab="audit">📜 Nhật Ký Kiểm Toán</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 1. TỔNG QUAN KIẾN TRÚC -->
+        <section id="overview" class="tab-content active">
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">🛡️ Kiến Trúc Bảo Mật 4 Lớp Ứng Dụng ECC</h2>
+                    <p class="card-desc">Hệ thống áp dụng mật mã đường cong Elliptic trên toàn bộ các lớp kiến trúc để đảm bảo Confidentiality, Integrity, Non-repudiation và Performance.</p>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <div style="background: rgba(56, 189, 248, 0.08); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--primary);">
+                            <strong>1. Lớp Truyền Tải (Data-in-Transit):</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Giao thức TLS 1.3 với bắt tay <strong>ECDHE (X25519)</strong> bảo đảm tính Bảo Mật Chuyển Tiếp Hoàn Hảo (Perfect Forward Secrecy).</p>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.08); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--accent);">
+                            <strong>2. Lớp Xác Thực & Định Danh (Identity & IAM):</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Cấp phát và xác thực <strong>JWT (ES256 & EdDSA)</strong> với chữ ký 64 bytes siêu nhẹ, tương thích Passkeys/FIDO2.</p>
+                        </div>
+                        <div style="background: rgba(245, 158, 11, 0.08); padding: 0.85rem; border-radius: 8px; border-left: 3px solid var(--warning);">
+                            <strong>3. Lớp Dữ Liệu Tĩnh (Data-at-Rest):</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Mã hóa phong bì <strong>ECIES Hybrid</strong> (X25519 + HKDF-SHA256 + AES-256-GCM) bảo vệ tài liệu mật và hồ sơ nhạy cảm.</p>
+                        </div>
+                        <div style="background: rgba(168, 85, 247, 0.08); padding: 0.85rem; border-radius: 8px; border-left: 3px solid #a855f7;">
+                            <strong>4. Lớp Toàn Vẹn & Kiểm Toán (Audit & Integrity):</strong>
+                            <p style="font-size: 0.85rem; color: var(--text-muted);">Chuỗi băm Hash-chaining kết hợp chữ ký số <strong>Ed25519</strong> ngăn chặn mọi hành vi chỉnh sửa trái phép nhật ký.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">📊 Bảng So Sánh Kỹ Thuật: ECC vs RSA</h2>
+                    <p class="card-desc">Cơ sở lý luận chọn ECC cho các hệ thống an toàn thế hệ mới.</p>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tiêu chí</th>
+                                    <th>RSA-3072</th>
+                                    <th>ECC (P-256 / Ed25519)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Độ an toàn</strong></td>
+                                    <td>128 bits</td>
+                                    <td>128 bits (Tương đương)</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kích thước khóa</strong></td>
+                                    <td>3072 bits (~384 bytes)</td>
+                                    <td><span style="color: var(--accent); font-weight: bold;">256 bits (32 bytes - Giảm 12x)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kích thước chữ ký</strong></td>
+                                    <td>384 bytes</td>
+                                    <td><span style="color: var(--accent); font-weight: bold;">64 bytes (Giảm 6x)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tốc độ sinh khóa</strong></td>
+                                    <td>Rất chậm (~400ms)</td>
+                                    <td><span style="color: var(--accent); font-weight: bold;">Cực nhanh (&lt; 0.1ms - Nhanh gấp 4000x)</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Tấn công kênh kề</strong></td>
+                                    <td>Nguy cơ cao</td>
+                                    <td>Ed25519 miễn nhiễm Timing Attack</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 1.5rem;">
+                <h2 class="card-title">🌐 Các Đường Cong Chuẩn Được Hệ Thống Hỗ Trợ</h2>
+                <div class="table-responsive" id="curvesTableContainer">
+                    <p>Đang tải thông tin các đường cong...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. QUẢN LÝ KHÓA (KEY STUDIO) -->
+        <section id="keystudio" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">🔑 Sinh Cặp Khóa ECC Mới</h2>
+                    <p class="card-desc">Khởi tạo cặp khóa mật mã bảo đảm tính ngẫu nhiên mật mã (CSPRNG) và tuân thủ định dạng chuẩn PEM/DER/JWK.</p>
+                    
+                    <div class="form-group">
+                        <label for="curveSelect">Chọn Đường Cong Elliptic:</label>
+                        <select id="curveSelect">
+                            <option value="ed25519">Ed25519 (Khuyến nghị cho Chữ ký & Xác thực - RFC 8032)</option>
+                            <option value="x25519">X25519 (Khuyến nghị cho Trao đổi khóa ECDH - RFC 7748)</option>
+                            <option value="prime256v1">NIST P-256 (secp256r1 - Chuẩn FIPS/WebAuthn/Passkeys)</option>
+                            <option value="secp384r1">NIST P-384 (secp384r1 - Mức bảo mật Quân sự CNSA)</option>
+                            <option value="secp256k1">secp256k1 (Koblitz Curve - Chuẩn ngành Blockchain)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn" id="btnGenerateKey">✨ Sinh Cặp Khóa ECC</button>
+
+                    <div id="keyGenResult" style="display: none; margin-top: 1rem;">
+                        <div class="alert alert-success">
+                            <span>Đã sinh thành công cặp khóa trên đường cong <strong id="resCurveName"></strong>!</span>
+                        </div>
+                        <label>Khóa Công Khai (Public Key - PEM):</label>
+                        <pre class="code-preview" id="resPubKeyPem"></pre>
+                        
+                        <label style="margin-top: 0.75rem;">Khóa Riêng (Private Key - PEM):</label>
+                        <pre class="code-preview" id="resPrivKeyPem"></pre>
+
+                        <div style="margin-top: 0.75rem; font-size: 0.85rem; color: var(--text-muted);">
+                            <strong>SHA-256 Fingerprint:</strong> <code id="resFingerprint" style="color: var(--primary);"></code>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">🛡️ Quy Tắc Quản Trị Vòng Đời Khóa (Key Lifecycle)</h2>
+                    <p class="card-desc">Chính sách bảo mật áp dụng cho hệ thống thông tin an toàn.</p>
+                    <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.6rem;">
+                        <li><strong>Khóa Tạm Thời (Ephemeral Keys):</strong> Bắt buộc dùng trong mọi phiên ECDHE/ECIES, tự hủy ngay sau khi phiên bắt tay kết thúc.</li>
+                        <li><strong>Khóa Dài Hạn (Root/Signing Keys):</strong> Lưu trữ trong mô-đun phần cứng HSM (Hardware Security Module) hoặc TPM đạt chuẩn FIPS 140-3 Level 3.</li>
+                        <li><strong>Thời Hạn Xoay Khóa (Key Rotation):</strong> Xoay khóa định kỳ 90 ngày đối với khóa ký Token JWT và 1 năm đối với CA nội bộ.</li>
+                        <li><strong>Zero Private-Key Exposure:</strong> Khóa riêng của người dùng không bao giờ được gửi qua mạng dưới dạng bản rõ.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. BẮT TAY ECDHE (PFS) -->
+        <section id="handshake" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">🤝 Mô Phỏng Giao Thức Trao Đổi Khóa Bất Đối Xứng ECDHE</h2>
+                <p class="card-desc">Mô phỏng quy trình Client (Alice) và Server (Bob) bắt tay đàm phán một khóa phiên AES-256 bí mật thông qua đường cong Elliptic mà kẻ đứng giữa (MITM) không thể khôi phục được.</p>
+
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1.5rem;">
+                    <select id="handshakeAlgoSelect" style="max-width: 250px;">
+                        <option value="x25519">X25519 (Montgomery - Siêu tốc độ)</option>
+                        <option value="prime256v1">NIST P-256 (Weierstrass - Chuẩn FIPS)</option>
+                    </select>
+                    <button class="btn" id="btnRunHandshake">🚀 Bắt Đầu Bắt Tay ECDHE</button>
+                </div>
+
+                <div id="handshakeVisual" style="display: none;">
+                    <div class="handshake-step">
+                        <h4>Bước 1: Alice (Client) sinh cặp khóa tạm thời (Ephemeral Keypair)</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Sinh khóa riêng ngẫu nhiên $a$, tính điểm công khai $A = a \cdot G$.</p>
+                        <pre class="code-preview" id="hsClientPub"></pre>
+                    </div>
+
+                    <div class="handshake-step">
+                        <h4>Bước 2: Bob (Server) sinh cặp khóa tạm thời (Ephemeral Keypair)</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Sinh khóa riêng ngẫu nhiên $b$, tính điểm công khai $B = b \cdot G$.</p>
+                        <pre class="code-preview" id="hsServerPub"></pre>
+                    </div>
+
+                    <div class="handshake-step">
+                        <h4>Bước 3: Trao đổi khóa công khai & Tính Bí Mật Chung (Shared Secret)</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Alice tính: $S = a \cdot B = a \cdot (b \cdot G)$. Bob tính: $S = b \cdot A = b \cdot (a \cdot G)$. Cả hai thu được cùng một giá trị điểm!</p>
+                        <pre class="code-preview" id="hsSharedSecret"></pre>
+                    </div>
+
+                    <div class="handshake-step">
+                        <h4>Bước 4: Rút trích khóa đối xứng phiên AES-256 qua HKDF-SHA256</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Bí mật chung được đưa qua hàm KDF chuẩn hóa để sinh ra khóa đối xứng an toàn cho kênh truyền dữ liệu.</p>
+                        <pre class="code-preview" id="hsDerivedKey" style="color: var(--accent);"></pre>
+                        <div class="alert alert-success" style="margin-top: 0.75rem;">
+                            <span>✓ Bắt tay hoàn tất trong <strong id="hsTime"></strong> ms! Đạt tính chất <strong>Perfect Forward Secrecy (PFS)</strong>.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. CHỮ KÝ SỐ (ED25519 & ECDSA) -->
+        <section id="signatures" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">✍️ Ký Số Điện Tử Văn Bản</h2>
+                    <p class="card-desc">Tạo chữ ký số chống chối bỏ và chống giả mạo trên dữ liệu nghiệp vụ.</p>
+
+                    <div class="form-group">
+                        <label for="sigAlgoSelect">Thuật Toán Ký:</label>
+                        <select id="sigAlgoSelect">
+                            <option value="ed25519">Ed25519 (EdDSA - 64 bytes, Chống Timing Attack, Nhanh nhất)</option>
+                            <option value="prime256v1">ECDSA P-256 (Deterministic Nonce RFC 6979)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sigPayloadInput">Nội Dung Văn Bản / Thông Điệp Cần Ký:</label>
+                        <textarea id="sigPayloadInput" rows="4">HỢP ĐỒNG ĐIỆN TỬ SỐ #8692/2026: Phê duyệt chuyển khoản 500,000,000 VNĐ vào quỹ bảo mật thông tin.</textarea>
+                    </div>
+
+                    <button class="btn" id="btnSignData">🖋️ Ký Số Ngay</button>
+
+                    <div id="sigResultBox" style="display: none; margin-top: 1rem;">
+                        <label>Chữ Ký Số Được Tạo (Hex):</label>
+                        <pre class="code-preview" id="sigOutputHex"></pre>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">
+                            Độ dài chữ ký: <span id="sigLength" style="color: var(--accent); font-weight: bold;"></span> bytes.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">🔍 Kiểm Tra Tính Toàn Vẹn & Thử Nghiệm Giả Mạo</h2>
+                    <p class="card-desc">Thử nghiệm xác thực chữ ký và kiểm chứng cơ chế phát hiện can thiệp dữ liệu.</p>
+
+                    <div class="form-group">
+                        <label for="verifyPayloadInput">Dữ Liệu Đang Được Kiểm Định:</label>
+                        <textarea id="verifyPayloadInput" rows="3"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="btn" id="btnVerifySig">✅ Xác Thực Chữ Ký Gốc</button>
+                        <button class="btn btn-danger" id="btnTamperData">⚠️ Giả Lập Sửa Đổi Dữ Liệu</button>
+                    </div>
+
+                    <div id="verifyResultAlert" style="margin-top: 1rem; display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. KHO TÀI LIỆU MẬT (ECIES VAULT) -->
+        <section id="vault" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">📦 Mã Hóa Lai ECIES & Lưu Trữ Tài Liệu Mật</h2>
+                    <p class="card-desc">Mã hóa phong bì kết hợp X25519, HKDF-SHA256, AES-256-GCM và Chữ ký số Ed25519.</p>
+
+                    <div class="form-group">
+                        <label for="docTitle">Tiêu Đề Hồ Sơ / Tài Liệu:</label>
+                        <input type="text" id="docTitle" value="Kế Hoạch Triển Khai Hạ Tầng An Ninh Quốc Gia 2026-2030">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="docClassification">Phân Cấp Độ Mật:</label>
+                        <select id="docClassification">
+                            <option value="CONFIDENTIAL">CONFIDENTIAL (Bảo mật)</option>
+                            <option value="SECRET">SECRET (Tối mật)</option>
+                            <option value="TOP_SECRET" selected>TOP SECRET (Tuyệt mật)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="docContent">Nội Dung Bản Rõ Cần Bảo Vệ:</label>
+                        <textarea id="docContent" rows="4">Hệ thống thông tin bảo mật cấp độ 5: Tọa độ trung tâm dữ liệu dự phòng, danh sách khóa gốc KMS, và kịch bản ứng phó sự cố máy tính lượng tử.</textarea>
+                    </div>
+
+                    <button class="btn" id="btnStoreDoc">🔒 Mã Hóa ECIES & Lưu Trữ Vào Vault</button>
+
+                    <div id="docStoreResult" style="display: none; margin-top: 1rem;">
+                        <div class="alert alert-success">
+                            <span>Tài liệu đã được mã hóa phong bì và ký số bảo đảm an toàn!</span>
+                        </div>
+                        <pre class="code-preview" id="docStoreJson"></pre>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">📂 Danh Sách Tài Liệu Trong Vault</h2>
+                    <p class="card-desc">Toàn bộ dữ liệu lưu trữ ở trạng thái mã hóa (Data-at-Rest). Chỉ người có Private Key mới giải mã được.</p>
+                    
+                    <div id="vaultDocsList" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">Chưa có tài liệu nào được mã hóa trong phiên này.</p>
+                    </div>
+
+                    <div id="decryptResultBox" style="display: none; margin-top: 1.5rem; background: rgba(0,0,0,0.4); padding: 1rem; border-radius: 8px; border: 1px solid var(--accent);">
+                        <h4 style="color: var(--accent);">🔓 Kết Quả Giải Mã Thành Công:</h4>
+                        <div id="decryptedTitle" style="font-weight: bold; margin-top: 0.5rem;"></div>
+                        <pre class="code-preview" id="decryptedText" style="color: #6ee7b7;"></pre>
+                        <div id="decryptedSigStatus" style="font-size: 0.85rem; margin-top: 0.5rem;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. PHÒNG THÍ NGHIỆM TẤN CÔNG (ATTACKS LAB) -->
+        <section id="attackslab" class="tab-content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2 class="card-title">💥 Tấn Công Lặp Nonce trong ECDSA (Vụ Sony PS3)</h2>
+                    <p class="card-desc">Mô phỏng toán học thực tế: Khi lập trình viên tái sử dụng cùng một số ngẫu nhiên $k$ cho 2 chữ ký khác nhau, kẻ tấn công tính ra ngay Private Key chỉ trong vài micro-giây!</p>
+
+                    <button class="btn btn-danger" id="btnRunNonceAttack">⚡ Khởi Chạy Tấn Công Khôi Phục Private Key</button>
+
+                    <div id="nonceAttackResult" style="display: none; margin-top: 1rem;">
+                        <div class="alert alert-danger">
+                            <span><strong>HỆ THỐNG BỊ BẺ KHÓA HOÀN TOÀN!</strong></span>
+                        </div>
+                        <div style="font-size: 0.85rem; display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div>Thời gian bẻ khóa: <strong id="atkTime" style="color: var(--danger);"></strong> micro-giây.</div>
+                            <div>Khóa riêng ban đầu: <code class="code-preview" id="atkOriginalKey"></code></div>
+                            <div>Khóa riêng bị hacker tính ra: <code class="code-preview" id="atkRecoveredKey" style="color: var(--danger);"></code></div>
+                        </div>
+
+                        <div class="alert alert-success" style="margin-top: 1rem;">
+                            <div>
+                                <strong>GIẢI PHÁP KHẮC PHỤC CỦA HỆ THỐNG:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.25rem;">
+                                    <li><strong>RFC 6979 (Deterministic ECDSA):</strong> Nonce $k$ được sinh xác định từ $HMAC(d_A, H(m))$, không bao giờ trùng lặp cho 2 thông điệp khác nhau.</li>
+                                    <li><strong>Ed25519:</strong> Thuật toán EdDSA hoàn toàn không cần bộ sinh số ngẫu nhiên khi ký.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">🛡️ Phòng Chống Tấn Công Điểm Không Hợp Lệ (Invalid Curve)</h2>
+                    <p class="card-desc">Kiểm thử tính năng xác thực điểm (Point Validation) nhằm ngăn chặn kẻ tấn công gửi tọa độ nằm ngoài đường cong để trích xuất khóa.</p>
+
+                    <div class="form-group">
+                        <label for="pointInput">Tọa độ điểm thử nghiệm (Hex):</label>
+                        <input type="text" id="pointInput" value="deadbeef1234567890abcdefdeadbeef">
+                    </div>
+
+                    <button class="btn btn-secondary" id="btnTestPointValidation">🧪 Kiểm Tra Hợp Lệ Điểm</button>
+
+                    <div id="pointValidationAlert" style="margin-top: 1rem; display: none;"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. BENCHMARK HIỆU NĂNG -->
+        <section id="benchmark" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h2 class="card-title">⚡ Đo Lường Hiệu Năng Trực Tiếp: ECC vs RSA</h2>
+                        <p class="card-desc">Benchmark chạy trực tiếp trên CPU của máy chủ hiện tại để đo thời gian mili-giây (ms).</p>
+                    </div>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <label style="margin: 0;">Số lần lặp:</label>
+                        <select id="benchIters" style="width: 80px;">
+                            <option value="15">15</option>
+                            <option value="30" selected>30</option>
+                            <option value="50">50</option>
+                        </select>
+                        <button class="btn" id="btnRunBenchmark">🚀 Chạy Benchmark Trực Tiếp</button>
+                    </div>
+                </div>
+
+                <div id="benchLoading" style="display: none; padding: 2rem; text-align: center;">
+                    <div style="font-size: 1.25rem; color: var(--primary);">⏳ Đang đo lường trên CPU... Vui lòng đợi trong giây lát...</div>
+                </div>
+
+                <div id="benchResultsView" style="display: none;">
+                    <div class="grid-2">
+                        <!-- Key Generation -->
+                        <div class="card" style="background: rgba(0,0,0,0.3);">
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--primary);">1. Tốc Độ Sinh Cặp Khóa (Key Generation Time - Càng thấp càng tốt)</h3>
+                            <div id="chartKeyGen"></div>
+                        </div>
+
+                        <!-- Signing -->
+                        <div class="card" style="background: rgba(0,0,0,0.3);">
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--accent);">2. Tốc Độ Ký Số (Signing Time - Càng thấp càng tốt)</h3>
+                            <div id="chartSigning"></div>
+                        </div>
+
+                        <!-- Verification -->
+                        <div class="card" style="background: rgba(0,0,0,0.3);">
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: #a855f7;">3. Tốc Độ Xác Thực Chữ Ký (Verification Time)</h3>
+                            <div id="chartVerify"></div>
+                        </div>
+
+                        <!-- Sizes -->
+                        <div class="card" style="background: rgba(0,0,0,0.3);">
+                            <h3 style="font-size: 1rem; margin-bottom: 1rem; color: var(--warning);">4. Kích Thước Băng Thông & Bộ Nhớ (Bytes)</h3>
+                            <div id="chartSizes"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. NHẬT KÝ KIỂM TOÁN (AUDIT TRAIL) -->
+        <section id="audit" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div>
+                        <h2 class="card-title">📜 Nhật Ký Kiểm Toán Bất Biến (Tamper-Evident Hash Chain)</h2>
+                        <p class="card-desc">Mỗi sự kiện bảo mật được liên kết với bản ghi trước bằng hàm băm SHA-256 và ký số bảo chứng bằng Ed25519.</p>
+                    </div>
+                    <button class="btn" id="btnVerifyAuditChain">🔍 Kiểm Tra Tính Toàn Vẹn Của Toàn Bộ Chuỗi</button>
+                </div>
+
+                <div id="auditVerifyStatus" style="display: none; margin-bottom: 1rem;"></div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Thời Điểm</th>
+                                <th>Hành Động</th>
+                                <th>Tác Nhân</th>
+                                <th>Previous Hash</th>
+                                <th>Event Hash</th>
+                                <th>Chữ Ký Ed25519</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTableBody">
+                            <tr><td colspan="7" style="text-align: center;">Đang tải nhật ký...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.8rem; border-top: 1px solid var(--border-color);">
+        🛡️ ECC-SecureGuard v1.0.0 — Hệ Thống Mật Mã Đường Cong Elliptic Cho Thông Tin An Toàn
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
