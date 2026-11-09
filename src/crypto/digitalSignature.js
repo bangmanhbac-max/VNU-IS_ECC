@@ -1,16 +1,7 @@
-/**
- * digitalSignature.js - Module Ký và Xác thực Chữ Ký Số ECC (Ed25519 & ECDSA P-256)
- */
-
 const crypto = require('crypto');
 const KeyManager = require('./keyManager');
 
 class DigitalSignature {
-    /**
-     * Ký số thông điệp hoặc tài liệu bằng Ed25519
-     * @param {crypto.KeyObject | string} privateKey - Khóa riêng Ed25519
-     * @param {string | Buffer} data 
-     */
     static signEd25519(privateKey, data) {
         let privKeyObj = privateKey;
         if (typeof privateKey === 'string') {
@@ -18,22 +9,17 @@ class DigitalSignature {
         }
 
         const dataBuffer = Buffer.isBuffer(data) ? data : Buffer.from(data, 'utf8');
-
-        // Ed25519 ký trực tiếp trên dữ liệu (bên trong tự băm bằng SHA-512 theo RFC 8032)
         const signature = crypto.sign(null, dataBuffer, privKeyObj);
 
         return {
             algorithm: 'Ed25519',
             signatureHex: signature.toString('hex'),
             signatureBase64: signature.toString('base64'),
-            signatureLengthBytes: signature.length, // Chuẩn 64 bytes
+            signatureLengthBytes: signature.length,
             signedAt: new Date().toISOString()
         };
     }
 
-    /**
-     * Xác thực chữ ký Ed25519
-     */
     static verifyEd25519(publicKey, signature, data) {
         let pubKeyObj = publicKey;
         if (typeof publicKey === 'string') {
@@ -62,10 +48,6 @@ class DigitalSignature {
         }
     }
 
-    /**
-     * Ký số bằng ECDSA (NIST P-256 / prime256v1) sử dụng chuẩn SHA-256
-     * Node.js OpenSSL 3.x sử dụng Deterministic Nonce (RFC 6979) để chống tấn công rò rỉ khóa do lặp nonce
-     */
     static signECDSA(privateKey, data, curve = 'prime256v1') {
         let privKeyObj = privateKey;
         if (typeof privateKey === 'string') {
@@ -79,13 +61,11 @@ class DigitalSignature {
         signer.update(dataBuffer);
         signer.end();
 
-        // Chữ ký trả về định dạng chuẩn DER-encoded ASN.1 (r, s)
         const signatureDer = signer.sign({
             key: privKeyObj,
             dsaEncoding: 'der'
         });
 
-        // Hashing checksum của tài liệu
         const dataHash = crypto.createHash(hashAlgo.toLowerCase()).update(dataBuffer).digest('hex');
 
         return {
@@ -100,9 +80,6 @@ class DigitalSignature {
         };
     }
 
-    /**
-     * Xác thực chữ ký ECDSA
-     */
     static verifyECDSA(publicKey, signature, data, curve = 'prime256v1') {
         let pubKeyObj = publicKey;
         if (typeof publicKey === 'string') {

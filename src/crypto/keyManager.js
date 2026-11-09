@@ -1,15 +1,7 @@
-/**
- * keyManager.js - Module quản lý vòng đời khóa ECC (Generation, Export, Import, Fingerprint)
- */
-
 const crypto = require('crypto');
 const { SUPPORTED_CURVES } = require('./curves');
 
 class KeyManager {
-    /**
-     * Sinh cặp khóa ECC dựa theo tên đường cong hoặc thuật toán
-     * @param {string} curveName - 'prime256v1', 'secp384r1', 'secp256k1', 'ed25519', 'x25519'
-     */
     static generateKeyPair(curveName = 'prime256v1') {
         const normalized = curveName.toLowerCase();
 
@@ -34,7 +26,7 @@ class KeyManager {
             privateKey = pair.privateKey;
             publicKey = pair.publicKey;
         } else {
-            throw new Error(`Đường cong '${curveName}' không được hỗ trợ. Các lựa chọn: prime256v1, secp384r1, secp256k1, ed25519, x25519`);
+            throw new Error(`Đường cong '${curveName}' không được hỗ trợ.`);
         }
 
         const pemPublic = publicKey.export({ type: 'spki', format: 'pem' });
@@ -42,7 +34,6 @@ class KeyManager {
         const derPublic = publicKey.export({ type: 'spki', format: 'der' });
         const fingerprint = crypto.createHash('sha256').update(derPublic).digest('hex');
 
-        // JWK export nếu là Node v18+
         let jwkPublic = null;
         try {
             jwkPublic = publicKey.export({ format: 'jwk' });
@@ -67,23 +58,14 @@ class KeyManager {
         };
     }
 
-    /**
-     * Nhập khóa công khai từ chuỗi PEM
-     */
     static importPublicKeyPem(pemString) {
         return crypto.createPublicKey(pemString);
     }
 
-    /**
-     * Nhập khóa riêng từ chuỗi PEM
-     */
     static importPrivateKeyPem(pemString) {
         return crypto.createPrivateKey(pemString);
     }
 
-    /**
-     * Tính toán Fingerprint chuẩn SHA-256 cho bất kỳ Public Key nào
-     */
     static getPublicKeyFingerprint(publicKey) {
         const der = publicKey.export({ type: 'spki', format: 'der' });
         return crypto.createHash('sha256').update(der).digest('hex');

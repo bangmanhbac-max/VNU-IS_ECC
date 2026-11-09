@@ -1,8 +1,3 @@
-/**
- * auditService.js - Dịch vụ nhật ký kiểm toán bất biến (Tamper-evident Audit Trail)
- * Áp dụng chuỗi băm (Hash-chaining) và Chữ ký số Ed25519 cho mọi sự kiện bảo mật
- */
-
 const crypto = require('crypto');
 const KeyManager = require('../crypto/keyManager');
 const DigitalSignature = require('../crypto/digitalSignature');
@@ -14,9 +9,6 @@ class AuditService {
         this.lastBlockHash = '0000000000000000000000000000000000000000000000000000000000000000';
     }
 
-    /**
-     * Ghi nhận một sự kiện bảo mật vào nhật ký
-     */
     logEvent(action, actor, details = {}) {
         const timestamp = new Date().toISOString();
         const eventIndex = this.logs.length;
@@ -33,7 +25,6 @@ class AuditService {
         const payloadToSign = JSON.stringify(eventData);
         const currentHash = crypto.createHash('sha256').update(payloadToSign).digest('hex');
 
-        // Ký số sự kiện bằng khóa Ed25519 của hệ thống
         const signature = DigitalSignature.signEd25519(this.systemSigner.keyObjects.privateKey, payloadToSign);
 
         const auditEntry = {
@@ -49,16 +40,12 @@ class AuditService {
         return auditEntry;
     }
 
-    /**
-     * Kiểm tra tính toàn vẹn của toàn bộ chuỗi nhật ký (Auditing & Tamper Verification)
-     */
     verifyChainIntegrity() {
         let prevHash = '0000000000000000000000000000000000000000000000000000000000000000';
 
         for (let i = 0; i < this.logs.length; i++) {
             const entry = this.logs[i];
 
-            // 1. Kiểm tra liên kết Hash Chain
             if (entry.previousHash !== prevHash) {
                 return {
                     valid: false,
@@ -67,7 +54,6 @@ class AuditService {
                 };
             }
 
-            // 2. Tái tạo dữ liệu gốc để kiểm tra chữ ký
             const originalData = {
                 index: entry.index,
                 previousHash: entry.previousHash,
@@ -84,11 +70,10 @@ class AuditService {
                 return {
                     valid: false,
                     corruptedAtIndex: i,
-                    reason: `Dữ liệu tại bản ghi #${i} đã bị sửa đổi trái phép (Hash mismatch)!`
+                    reason: `Dữ liệu tại bản ghi #${i} đã bị sửa đổi trái phép!`
                 };
             }
 
-            // 3. Xác thực chữ ký số Ed25519
             const sigVerification = DigitalSignature.verifyEd25519(
                 this.systemSigner.keyObjects.publicKey,
                 entry.signatureHex,
@@ -119,5 +104,4 @@ class AuditService {
     }
 }
 
-// Singleton audit service
 module.exports = new AuditService();

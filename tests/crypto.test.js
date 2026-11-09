@@ -1,7 +1,3 @@
-/**
- * crypto.test.js - Bộ kiểm thử tự động toàn diện cho các module Mật mã ECC
- */
-
 const { test, describe } = require('node:test');
 const assert = require('node:assert');
 
@@ -27,8 +23,8 @@ describe('ECC Core Cryptography Suite', () => {
     test('2. ECDHE Key Exchange (X25519) with Perfect Forward Secrecy', () => {
         const handshake = ECDHExchange.simulateFullHandshake('x25519');
         assert.strictEqual(handshake.success, true, 'Client and Server must derive identical Shared Secret');
-        assert.strictEqual(handshake.derivedAesKeyHex.length, 64, 'Derived AES-256 key must be 32 bytes (64 hex chars)');
-        assert.ok(handshake.handshakeTimeMs < 50, 'X25519 handshake should complete rapidly (< 50ms)');
+        assert.strictEqual(handshake.derivedAesKeyHex.length, 64, 'Derived AES-256 key must be 32 bytes');
+        assert.ok(handshake.handshakeTimeMs < 50, 'X25519 handshake should complete rapidly');
     });
 
     test('3. ECDHE Key Exchange (NIST P-256)', () => {
@@ -41,18 +37,15 @@ describe('ECC Core Cryptography Suite', () => {
         const secretMessage = 'Top secret coordinates and system parameters 2026';
         const aad = 'doc_classification=TOP_SECRET';
 
-        // Mã hóa
         const envelope = ECIESHybrid.encrypt(recipient.pem.publicKey, secretMessage, aad, 'x25519');
         assert.ok(envelope.ciphertextBase64, 'Ciphertext must exist');
         assert.strictEqual(envelope.curve, 'x25519');
-        assert.strictEqual(envelope.ivHex.length, 24, 'AES-GCM IV must be 12 bytes (24 hex)');
-        assert.strictEqual(envelope.authTagHex.length, 32, 'AES-GCM Auth Tag must be 16 bytes (32 hex)');
+        assert.strictEqual(envelope.ivHex.length, 24, 'AES-GCM IV must be 12 bytes');
+        assert.strictEqual(envelope.authTagHex.length, 32, 'AES-GCM Auth Tag must be 16 bytes');
 
-        // Giải mã thành công
         const decrypted = ECIESHybrid.decrypt(recipient.pem.privateKey, envelope, aad);
         assert.strictEqual(decrypted.plaintext, secretMessage, 'Decrypted plaintext must match original');
 
-        // Thử giả mạo bản mã -> phát hiện lỗi xác thực
         const corruptedEnvelope = JSON.parse(JSON.stringify(envelope));
         corruptedEnvelope.ciphertextBase64 = Buffer.from('corrupted ciphertext payload').toString('base64');
         assert.throws(() => {
@@ -64,16 +57,13 @@ describe('ECC Core Cryptography Suite', () => {
         const signer = KeyManager.generateKeyPair('ed25519');
         const document = 'Electronic contract transfer $5,000,000 USD';
 
-        // Ký
         const signResult = DigitalSignature.signEd25519(signer.pem.privateKey, document);
         assert.strictEqual(signResult.algorithm, 'Ed25519');
         assert.strictEqual(signResult.signatureLengthBytes, 64, 'Ed25519 signature must always be exactly 64 bytes');
 
-        // Xác thực hợp lệ
         const verifySuccess = DigitalSignature.verifyEd25519(signer.pem.publicKey, signResult.signatureHex, document);
         assert.strictEqual(verifySuccess.valid, true, 'Original document signature must verify');
 
-        // Xác thực khi tài liệu bị sửa đổi (Tampered)
         const tamperedDocument = document + ' (MODIFIED TO $50,000,000 USD)';
         const verifyTampered = DigitalSignature.verifyEd25519(signer.pem.publicKey, signResult.signatureHex, tamperedDocument);
         assert.strictEqual(verifyTampered.valid, false, 'Tampered document must fail verification');
@@ -97,20 +87,17 @@ describe('ECC Core Cryptography Suite', () => {
 
         const userPayload = { userId: 'u_101', role: 'admin', username: 'antigravity' };
 
-        // 7.1 ES256 Token
         const es256Token = JwtECC.sign(userPayload, p256Signer.pem.privateKey, 'ES256', 3600);
         assert.strictEqual(es256Token.split('.').length, 3, 'JWT must have 3 parts: header.payload.signature');
         const es256Verified = JwtECC.verify(es256Token, p256Signer.pem.publicKey);
         assert.strictEqual(es256Verified.valid, true);
         assert.strictEqual(es256Verified.payload.username, 'antigravity');
 
-        // 7.2 EdDSA Token
         const edToken = JwtECC.sign(userPayload, edSigner.pem.privateKey, 'EdDSA', 3600);
         const edVerified = JwtECC.verify(edToken, edSigner.pem.publicKey);
         assert.strictEqual(edVerified.valid, true);
         assert.strictEqual(edVerified.payload.role, 'admin');
 
-        // 7.3 Token tampering
         const forgedToken = es256Token.substring(0, es256Token.length - 5) + 'AAAAA';
         assert.throws(() => {
             JwtECC.verify(forgedToken, p256Signer.pem.publicKey);

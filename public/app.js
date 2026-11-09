@@ -1,9 +1,4 @@
-/**
- * app.js - Xử lý logic tương tác trên Web Dashboard ECC-SecureGuard
- */
-
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. TABS NAVIGATION
     const tabButtons = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
 
@@ -18,29 +13,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const content = document.getElementById(targetTab);
             if (content) content.classList.add('active');
 
-            // Nạp dữ liệu khi chuyển tab nếu cần
             if (targetTab === 'audit') loadAuditLogs();
             if (targetTab === 'vault') loadVaultDocuments();
         });
     });
 
-    // 2. KHỞI TẠO HỆ THỐNG
     initSystemStatus();
     loadCurvesReference();
 
-    // Biến lưu trữ cặp khóa tạm thời trong phiên làm việc của giao diện
     let activeKeyPair = null;
     let lastSignedData = null;
     let lastSignature = null;
     let lastSigningKey = null;
 
-    // --- TAB 1: SYSTEM STATUS & CURVES ---
     async function initSystemStatus() {
         try {
             const res = await fetch('/api/system/status');
             const data = await res.json();
             const badge = document.getElementById('systemStatusText');
-            badge.textContent = `HỆ THỐNG TRỰC TUYẾN (${data.engine})`;
+            badge.textContent = `HỆ THỐNG TRỰC TUYẾN (${data.engine}) - ${data.organization}`;
         } catch (err) {
             document.getElementById('systemStatusText').textContent = 'MẤT KẾT NỐI API';
             document.getElementById('systemStatusBadge').style.borderColor = 'var(--danger)';
@@ -85,7 +76,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- TAB 2: KEY STUDIO ---
     const btnGenerateKey = document.getElementById('btnGenerateKey');
     btnGenerateKey.addEventListener('click', async () => {
         const curve = document.getElementById('curveSelect').value;
@@ -115,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- TAB 3: ECDHE HANDSHAKE ---
     const btnRunHandshake = document.getElementById('btnRunHandshake');
     btnRunHandshake.addEventListener('click', async () => {
         const algorithm = document.getElementById('handshakeAlgoSelect').value;
@@ -144,13 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- TAB 4: DIGITAL SIGNATURES ---
     const btnSignData = document.getElementById('btnSignData');
     btnSignData.addEventListener('click', async () => {
         const data = document.getElementById('sigPayloadInput').value;
         const algorithm = document.getElementById('sigAlgoSelect').value;
 
-        // Sinh cặp khóa ký tạm cho demo nếu chưa có
         btnSignData.textContent = '⏳ Đang ký...';
         btnSignData.disabled = true;
 
@@ -180,7 +167,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sigOutputHex').textContent = sigResult.signatureHex;
             document.getElementById('sigLength').textContent = sigResult.signatureLengthBytes || sigResult.derLengthBytes;
 
-            // Đưa dữ liệu sang ô xác thực
             document.getElementById('verifyPayloadInput').value = data;
             document.getElementById('verifyResultAlert').style.display = 'none';
         } catch (err) {
@@ -236,7 +222,6 @@ document.addEventListener('DOMContentLoaded', () => {
         btnVerifySig.click();
     });
 
-    // --- TAB 5: SECURE VAULT ---
     const btnStoreDoc = document.getElementById('btnStoreDoc');
     btnStoreDoc.addEventListener('click', async () => {
         const title = document.getElementById('docTitle').value;
@@ -313,7 +298,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function decryptDocument(docId) {
         try {
-            // Lấy khóa riêng của user admin mặc định từ backend
             const loginRes = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -345,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- TAB 6: ATTACKS LAB ---
     const btnRunNonceAttack = document.getElementById('btnRunNonceAttack');
     btnRunNonceAttack.addEventListener('click', async () => {
         btnRunNonceAttack.textContent = '⏳ Đang giải toán khôi phục khóa...';
@@ -393,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- TAB 7: BENCHMARK ---
     const btnRunBenchmark = document.getElementById('btnRunBenchmark');
     btnRunBenchmark.addEventListener('click', async () => {
         const iters = document.getElementById('benchIters').value;
@@ -468,7 +450,6 @@ document.addEventListener('DOMContentLoaded', () => {
         el.innerHTML = html;
     }
 
-    // --- TAB 8: AUDIT TRAIL ---
     async function loadAuditLogs() {
         try {
             const res = await fetch('/api/audit/logs');

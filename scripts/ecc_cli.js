@@ -1,7 +1,4 @@
 #!/usr/bin/env node
-/**
- * ecc_cli.js - Giao diện dòng lệnh (CLI) tương tác trực tiếp với hệ thống mật mã ECC
- */
 
 const KeyManager = require('../src/crypto/keyManager');
 const ECDHExchange = require('../src/crypto/ecdhExchange');
@@ -14,7 +11,8 @@ const [,, command, ...args] = process.argv;
 
 function printUsage() {
     console.log(`
-🛡️  ECC-SECUREGUARD CLI - Bộ công cụ dòng lệnh Mật mã Đường cong Elliptic
+🛡️  VNU-IS ECC CLI - Bộ công cụ dòng lệnh Mật mã Đường cong Elliptic
+Tác giả: Bùi Kim Ngân & Nguyễn Tuấn Minh (AIVN)
 
 Sử dụng: node scripts/ecc_cli.js <lệnh> [tùy chọn]
 
@@ -65,7 +63,6 @@ switch (command) {
         console.log(`- Kích thước chữ ký: ${sig.signatureLengthBytes} bytes (chuẩn RFC 8032)`);
         console.log(`- Signature Hex:     ${sig.signatureHex}`);
         
-        // Kiểm tra xác thực ngay lập tức
         const verified = DigitalSignature.verifyEd25519(signer.keyObjects.publicKey, sig.signatureHex, text);
         console.log(`- Xác thực chữ ký:   ${verified.valid ? 'HỢP LỆ (ORIGINAL)' : 'KHÔNG HỢP LỆ'}\n`);
         break;

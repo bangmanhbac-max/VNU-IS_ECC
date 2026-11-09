@@ -1,7 +1,3 @@
-/**
- * authService.js - Dịch vụ xác thực người dùng và phân quyền RBAC dựa trên ECC
- */
-
 const crypto = require('crypto');
 const KeyManager = require('../crypto/keyManager');
 const JwtECC = require('../crypto/jwtEcc');
@@ -10,18 +6,14 @@ const auditService = require('./auditService');
 class AuthService {
     constructor() {
         this.users = new Map();
-        
-        // Khóa định danh của Authorization Server (dùng ký JWT)
         this.jwtSignerP256 = KeyManager.generateKeyPair('prime256v1');
         this.jwtSignerEd25519 = KeyManager.generateKeyPair('ed25519');
-
-        // Khởi tạo một tài khoản Quản trị viên mặc định
         this.seedInitialUsers();
     }
 
     seedInitialUsers() {
-        this.registerUser('admin', 'Admin@SecSys2026!', 'Quản Trị Viên Hệ Thống', 'admin');
-        this.registerUser('sec_officer', 'Officer@SecSys2026!', 'Cán Bộ An Toàn Thông Tin', 'officer');
+        this.registerUser('admin', 'Admin@SecSys2026!', 'Bùi Kim Ngân', 'admin');
+        this.registerUser('sec_officer', 'Officer@SecSys2026!', 'Nguyễn Tuấn Minh', 'officer');
         this.registerUser('alice', 'Alice@Secure2026!', 'Alice Specialist', 'user');
     }
 
@@ -31,9 +23,6 @@ class AuthService {
         return { hash, salt: actualSalt };
     }
 
-    /**
-     * Đăng ký người dùng mới, tự động sinh cặp khóa riêng / khóa công khai ECC cho người dùng
-     */
     registerUser(username, password, fullName = '', role = 'user', preferredCurve = 'ed25519') {
         if (this.users.has(username)) {
             throw new Error(`Tên đăng nhập '${username}' đã tồn tại trong hệ thống.`);
@@ -41,7 +30,6 @@ class AuthService {
 
         const { hash, salt } = this.hashPassword(password);
 
-        // Sinh cặp khóa định danh cá nhân cho người dùng (để ký và nhận tài liệu mã hóa ECIES)
         const userSigningKey = KeyManager.generateKeyPair(preferredCurve);
         const userEncryptionKey = KeyManager.generateKeyPair('x25519');
 
@@ -92,9 +80,6 @@ class AuthService {
         };
     }
 
-    /**
-     * Đăng nhập và cấp phát JWT ký bằng ES256 hoặc EdDSA
-     */
     login(username, password, jwtAlgorithm = 'ES256') {
         const user = this.users.get(username);
         if (!user) {
@@ -108,7 +93,6 @@ class AuthService {
             throw new Error('Tài khoản hoặc mật khẩu không chính xác.');
         }
 
-        // Tạo JWT ký bằng khóa ECC của Server
         const payload = {
             sub: user.id,
             username: user.username,
@@ -144,12 +128,8 @@ class AuthService {
         };
     }
 
-    /**
-     * Xác thực Token gửi lên từ Client
-     */
     verifyToken(token) {
         try {
-            // Thử xác thực với ES256 trước, nếu không được thử EdDSA
             try {
                 return JwtECC.verify(token, this.jwtSignerP256.keyObjects.publicKey);
             } catch (e1) {

@@ -1,7 +1,3 @@
-/**
- * api.js - Router định nghĩa toàn bộ API Endpoints cho Hệ thống Mật mã ECC
- */
-
 const express = require('express');
 const router = express.Router();
 
@@ -17,7 +13,6 @@ const authService = require('../services/authService');
 const vaultService = require('../services/vaultService');
 const auditService = require('../services/auditService');
 
-// Middleware xác thực JWT đơn giản
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
@@ -32,14 +27,15 @@ function authenticateToken(req, res, next) {
     }
 }
 
-// 1. SYSTEM STATUS & CURVES METADATA
 router.get('/system/status', (req, res) => {
     res.json({
-        system: 'ECC-SecureGuard Information System',
+        system: 'VNU-IS ECC Information System',
         status: 'ONLINE',
         nodeVersion: process.version,
         engine: 'OpenSSL 3.x Hardware Accelerated Cryptography',
         supportedCurvesCount: Object.keys(SUPPORTED_CURVES).length,
+        authors: ['Bùi Kim Ngân', 'Nguyễn Tuấn Minh'],
+        organization: 'AIVN',
         timestamp: new Date().toISOString()
     });
 });
@@ -48,7 +44,6 @@ router.get('/curves', (req, res) => {
     res.json(SUPPORTED_CURVES);
 });
 
-// 2. KEY MANAGEMENT STUDIO
 router.post('/keys/generate', (req, res) => {
     try {
         const { curve = 'prime256v1' } = req.body;
@@ -68,7 +63,6 @@ router.post('/keys/generate', (req, res) => {
     }
 });
 
-// 3. ECDH / X25519 KEY EXCHANGE
 router.post('/ecdh/handshake-simulation', (req, res) => {
     try {
         const { algorithm = 'x25519' } = req.body;
@@ -92,7 +86,6 @@ router.post('/ecdh/compute-secret', (req, res) => {
     }
 });
 
-// 4. ECIES HYBRID ENCRYPTION (AES-256-GCM + X25519 / P-256)
 router.post('/ecies/encrypt', (req, res) => {
     try {
         const { recipientPublicKeyPem, plaintext, associatedData = '', curve = 'x25519' } = req.body;
@@ -119,7 +112,6 @@ router.post('/ecies/decrypt', (req, res) => {
     }
 });
 
-// 5. DIGITAL SIGNATURES (Ed25519 & ECDSA P-256)
 router.post('/signature/sign', (req, res) => {
     try {
         const { privateKeyPem, data, algorithm = 'ed25519' } = req.body;
@@ -158,7 +150,6 @@ router.post('/signature/verify', (req, res) => {
     }
 });
 
-// 6. AUTHENTICATION & IDENTITY (ECC-JWT)
 router.post('/auth/register', (req, res) => {
     try {
         const { username, password, fullName, role = 'user', preferredCurve = 'ed25519' } = req.body;
@@ -181,7 +172,6 @@ router.post('/auth/login', (req, res) => {
     }
 });
 
-// 7. SECURE DOCUMENT VAULT (ENVELOPE ENCRYPTION)
 router.get('/vault/documents', (req, res) => {
     res.json(vaultService.getAllDocumentsSummary());
 });
@@ -198,7 +188,6 @@ router.post('/vault/documents', (req, res) => {
             return res.status(404).json({ error: `Không tìm thấy tác giả ${authorUsername}` });
         }
 
-        // Nếu không chỉ định recipientPublicKeyPem, dùng khóa của tác giả hoặc hệ thống
         const targetPubKey = recipientPublicKeyPem || authorUser.keys.encryption.publicKeyPem;
 
         const storedDoc = vaultService.storeDocument(
@@ -241,7 +230,6 @@ router.post('/vault/documents/decrypt', (req, res) => {
     }
 });
 
-// 8. AUDIT LOGS & INTEGRITY VERIFICATION
 router.get('/audit/logs', (req, res) => {
     res.json(auditService.getAllLogs());
 });
@@ -251,7 +239,6 @@ router.post('/audit/verify', (req, res) => {
     res.json(report);
 });
 
-// 9. SECURITY ATTACKS LAB
 router.post('/attacks/nonce-reuse', (req, res) => {
     try {
         const result = AttackSimulator.simulateNonceReuseAttack();
@@ -271,7 +258,6 @@ router.post('/attacks/invalid-curve', (req, res) => {
     }
 });
 
-// 10. REAL-TIME CRYPTOGRAPHIC BENCHMARK
 router.get('/benchmark', (req, res) => {
     try {
         const iterations = parseInt(req.query.iterations) || 30;

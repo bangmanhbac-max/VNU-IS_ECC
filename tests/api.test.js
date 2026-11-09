@@ -1,13 +1,8 @@
-/**
- * api.test.js - Kiểm thử tích hợp toàn bộ REST API của Hệ thống ECC (In-Memory Sandbox Friendly)
- */
-
 const { test, describe } = require('node:test');
 const assert = require('node:assert');
 const { Readable } = require('stream');
 const { app } = require('../server');
 
-// Bộ giả lập HTTP Request/Response in-memory không cần mở Socket TCP
 function callApi(method, url, body = null, headers = {}) {
     return new Promise((resolve, reject) => {
         const bodyStr = body ? JSON.stringify(body) : null;
@@ -64,6 +59,7 @@ describe('ECC REST API In-Memory Integration Suite', () => {
         assert.strictEqual(status, 200);
         assert.strictEqual(data.status, 'ONLINE');
         assert.ok(data.supportedCurvesCount >= 5);
+        assert.strictEqual(data.organization, 'AIVN');
     });
 
     test('2. POST /api/keys/generate creates valid keypairs', async () => {
@@ -83,12 +79,10 @@ describe('ECC REST API In-Memory Integration Suite', () => {
     });
 
     test('4. POST /api/ecies/encrypt and /decrypt flow', async () => {
-        // Sinh khóa người nhận
         const keyGen = await callApi('POST', '/api/keys/generate', { curve: 'x25519' });
         const pubPem = keyGen.data.publicKeyPem;
         const privPem = keyGen.data.privateKeyPem;
 
-        // Mã hóa
         const plain = 'Testing API ECIES Hybrid Payload 2026';
         const encRes = await callApi('POST', '/api/ecies/encrypt', {
             recipientPublicKeyPem: pubPem,
@@ -97,7 +91,6 @@ describe('ECC REST API In-Memory Integration Suite', () => {
         });
         assert.strictEqual(encRes.status, 200);
 
-        // Giải mã
         const decRes = await callApi('POST', '/api/ecies/decrypt', {
             recipientPrivateKeyPem: privPem,
             envelope: encRes.data
