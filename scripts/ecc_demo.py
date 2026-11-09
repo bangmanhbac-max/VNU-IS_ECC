@@ -53,7 +53,7 @@ def scalar_multiply(k, point):
 def main():
     print("=" * 65)
     print("   VNU-IS ECC: TOÁN HỌC ĐƯỜNG CONG ELLIPTIC")
-    print("   Tác giả: Bùi Kim Ngân & Nguyễn Tuấn Minh (AIVN)")
+    print("   Tác giả: Nguyễn Tuấn Minh (AIVN)")
     print(f"   Phương trình: y^2 = x^3 + {A}x + {B} (mod {P})")
     print("=" * 65)
 

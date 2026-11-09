@@ -34,7 +34,7 @@ router.get('/system/status', (req, res) => {
         nodeVersion: process.version,
         engine: 'OpenSSL 3.x Hardware Accelerated Cryptography',
         supportedCurvesCount: Object.keys(SUPPORTED_CURVES).length,
-        authors: ['Bùi Kim Ngân', 'Nguyễn Tuấn Minh'],
+        authors: ['Nguyễn Tuấn Minh'],
         organization: 'AIVN',
         timestamp: new Date().toISOString()
     });

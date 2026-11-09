@@ -22,7 +22,7 @@ if (require.main === module) {
     app.listen(PORT, () => {
         console.log('================================================================');
         console.log('   🛡️  VNU-IS ECC: HỆ THỐNG THÔNG TIN AN TOÀN ECC v1.0.0');
-        console.log('   Tác giả: Bùi Kim Ngân & Nguyễn Tuấn Minh (AIVN)');
+        console.log('   Tác giả: Nguyễn Tuấn Minh (AIVN)');
         console.log('================================================================');
         console.log(`[+] Web Dashboard UI:    http://localhost:${PORT}`);
         console.log(`[+] API Base URL:        http://localhost:${PORT}/api`);

@@ -12,7 +12,7 @@ const [,, command, ...args] = process.argv;
 function printUsage() {
     console.log(`
 🛡️  VNU-IS ECC CLI - Bộ công cụ dòng lệnh Mật mã Đường cong Elliptic
-Tác giả: Bùi Kim Ngân & Nguyễn Tuấn Minh (AIVN)
+Tác giả: Nguyễn Tuấn Minh (AIVN)
 
 Sử dụng: node scripts/ecc_cli.js <lệnh> [tùy chọn]
 

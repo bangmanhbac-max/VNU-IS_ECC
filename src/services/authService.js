@@ -12,7 +12,7 @@ class AuthService {
     }
 
     seedInitialUsers() {
-        this.registerUser('admin', 'Admin@SecSys2026!', 'Bùi Kim Ngân', 'admin');
+        this.registerUser('admin', 'Admin@SecSys2026!', 'Nguyễn Tuấn Minh', 'admin');
         this.registerUser('sec_officer', 'Officer@SecSys2026!', 'Nguyễn Tuấn Minh', 'officer');
         this.registerUser('alice', 'Alice@Secure2026!', 'Alice Specialist', 'user');
     }

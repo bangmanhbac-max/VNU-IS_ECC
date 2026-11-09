@@ -16,8 +16,8 @@
 
 ---
 
-### 👨‍💻 NHÓM TÁC GIẢ & ĐƠN VỊ THỰC HIỆN
-**Bùi Kim Ngân** & **Nguyễn Tuấn Minh**  
+### 👨‍💻 TÁC GIẢ & ĐƠN VỊ THỰC HIỆN
+**Nguyễn Tuấn Minh**  
 *Đơn vị nghiên cứu:* **AIVN**  
 *Khoa/Trường:* **Trường Quốc tế - Đại học Quốc gia Hà Nội (VNU-IS)**  
 *Dự án:* **VNU-IS_ECC (Elliptic Curve Cryptography Information System)**  
@@ -63,7 +63,7 @@ Trong kiến trúc hệ thống thông tin hiện đại (Cloud Computing, IoT, 
 
 **Mật mã Đường cong Elliptic (ECC)** ra đời như một bước tiến mang tính cách mạng, dựa trên nền tảng đại số của các nhóm điểm trên đường cong elliptic trên trường hữu hạn $\mathbb{F}_p$. Với khóa chỉ **256 bits**, ECC cung cấp độ an toàn tương đương RSA 3072 bits, giảm kích thước khóa **12 lần**, giảm kích thước chữ ký **6 lần**, và tăng tốc độ sinh khóa tới **hơn 6,000 lần**.
 
-Dự án **VNU-IS_ECC** do nhóm nghiên cứu **Bùi Kim Ngân** và **Nguyễn Tuấn Minh** thuộc **AIVN** xây dựng nhằm cung cấp một hệ thống tham chiếu an toàn thông tin hoàn chỉnh, đạt chuẩn công nghiệp, chứng minh tính ưu việt của ECC trên mọi tầng ứng dụng.
+Dự án **VNU-IS_ECC** do tác giả **Nguyễn Tuấn Minh** thuộc **AIVN** xây dựng nhằm cung cấp một hệ thống tham chiếu an toàn thông tin hoàn chỉnh, đạt chuẩn công nghiệp, chứng minh tính ưu việt của ECC trên mọi tầng ứng dụng.
 
 ---
 
@@ -390,7 +390,7 @@ Terminal sẽ hiển thị banner thông số vận hành:
 ```text
 ================================================================
    🛡️  VNU-IS ECC: HỆ THỐNG THÔNG TIN AN TOÀN ECC v1.0.0
-   Tác giả: Bùi Kim Ngân & Nguyễn Tuấn Minh (AIVN)
+   Tác giả: Nguyễn Tuấn Minh (AIVN)
 ================================================================
 [+] Web Dashboard UI:    http://localhost:3000
 [+] API Base URL:        http://localhost:3000/api
@@ -481,7 +481,7 @@ Output minh họa:
 ```text
 =================================================================
    VNU-IS ECC: TOÁN HỌC ĐƯỜNG CONG ELLIPTIC
-   Tác giả: Bùi Kim Ngân & Nguyễn Tuấn Minh (AIVN)
+   Tác giả: Nguyễn Tuấn Minh (AIVN)
    Phương trình: y^2 = x^3 + 2x + 3 (mod 97)
 =================================================================
 [+] Điểm cơ sở (Generator Point G): (3, 6)
@@ -523,7 +523,7 @@ Bob tính:   S_Bob   = b * A = (80, 10)
     "nodeVersion": "v18.14.0",
     "engine": "OpenSSL 3.x Hardware Accelerated Cryptography",
     "supportedCurvesCount": 5,
-    "authors": ["Bùi Kim Ngân", "Nguyễn Tuấn Minh"],
+    "authors": ["Nguyễn Tuấn Minh"],
     "organization": "AIVN",
     "timestamp": "2026-11-09T12:20:00.000Z"
   }
@@ -719,7 +719,7 @@ Dự án này được phát triển phục vụ công tác nghiên cứu và tr
 ### Trích Dẫn Học Thuật (BibTeX Citation):
 ```bibtex
 @software{vnu_is_ecc_2026,
-  author       = {Bui Kim Ngan and Nguyen Tuan Minh},
+  author       = {Nguyen Tuan Minh},
   title        = {VNU-IS_ECC: Production-Grade Elliptic Curve Cryptography Information System},
   year         = {2026},
   publisher    = {GitHub},
@@ -731,5 +731,5 @@ Dự án này được phát triển phục vụ công tác nghiên cứu và tr
 ---
 
 <div align="center">
-  <sub>Bản quyền © 2026 thuộc về <b>Bùi Kim Ngân</b> & <b>Nguyễn Tuấn Minh</b> (AIVN / VNU-IS). Phát hành theo giấy phép MIT.</sub>
+  <sub>Bản quyền © 2026 thuộc về <b>Nguyễn Tuấn Minh</b> (AIVN / VNU-IS). Phát hành theo giấy phép MIT.</sub>
 </div>
